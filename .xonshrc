@@ -1,0 +1,53 @@
+from prompt_toolkit.keys import Keys
+from prompt_toolkit.application import run_in_terminal
+
+
+$XONSH_SHOW_TRACEBACK = True
+$XONSH_TRACEBACK_LOGFILE = 'error.log'
+
+#aliases['kak'] = lambda args: execx(f"tmux -c 'kak {args[0]}'")
+
+# XONSH WEBCONFIG START
+$XONSH_COLOR_STYLE = 'default'
+$PROMPT = '{INTENSE_PURPLE}┬─[{YELLOW}{user}{RESET}@{BLUE}{hostname}{RESET}:{cwd}{INTENSE_PURPLE}]─[{INTENSE_BLUE}{localtime}{INTENSE_PURPLE}]─[{RESET}{INTENSE_PURPLE}{gitstatus}{INTENSE_PURPLE}]\n{INTENSE_PURPLE}╰─>{INTENSE_RED}{prompt_end}{RESET} '
+# XONSH WEBCONFIG END
+
+
+def _multiline(line_number, width):
+    return f'{{PURPLE}}{line_number:>{width - 2}}|{{RESET}}'
+
+$MULTILINE_PROMPT = _multiline
+
+execx($(zoxide init xonsh), 'exec', __xonsh__.ctx, filename='zoxide')
+
+#$COMPLETION_QUERY_LIMIT = 500 # increase limit
+#exec($(example _carapace xonsh))
+
+$INDENT = "  "
+
+def keybindingsWrapper(task, event):
+    event.current_buffer.text = ""
+    run_in_terminal(task)
+    event.current_buffer.validate_and_handle()
+
+@events.on_ptk_create
+def custom_keybindings(bindings, **kw):
+    @bindings.add(Keys.ControlL)
+    def launch_zoxide(event):
+        def _task():
+            zi|| true
+        keybindingsWrapper(_task, event)
+    @bindings.add(Keys.ControlJ)
+    def launch_lazygit(event):
+        def _task():
+            lazygit || true
+        keybindingsWrapper(_task, event)
+
+
+@aliases.register
+def _l(args):
+    ls -lAh @(args)
+
+@aliases.register
+def _ll(args):
+    ls -lh @(args)
