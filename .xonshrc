@@ -46,3 +46,7 @@ def _l(args):
 @aliases.register
 def _ll(args):
     ls -lh @(args)
+
+@aliases.register
+def _kak(args):
+    tmux new -- kak @(args)
