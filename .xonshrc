@@ -20,28 +20,23 @@ $MULTILINE_PROMPT = _multiline
 
 execx($(zoxide init xonsh), 'exec', __xonsh__.ctx, filename='zoxide')
 
-#$COMPLETION_QUERY_LIMIT = 500 # increase limit
-#exec($(example _carapace xonsh))
-
 $INDENT = "  "
 
-def keybindingsWrapper(task, event):
+def keybindingsWrapper(command, event):
+    def _task():
+        execx(command + " || true")
     event.current_buffer.text = ""
-    run_in_terminal(task)
+    run_in_terminal(_task)
     event.current_buffer.validate_and_handle()
 
 @events.on_ptk_create
 def custom_keybindings(bindings, **kw):
     @bindings.add(Keys.ControlL)
     def launch_zoxide(event):
-        def _task():
-            zi|| true
-        keybindingsWrapper(_task, event)
+        keybindingsWrapper("zi", event)
     @bindings.add(Keys.ControlJ)
     def launch_lazygit(event):
-        def _task():
-            lazygit || true
-        keybindingsWrapper(_task, event)
+        keybindingsWrapper("lazygit", event)
 
 
 @aliases.register
