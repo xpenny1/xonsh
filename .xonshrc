@@ -50,3 +50,8 @@ def _ll(args):
 @aliases.register
 def _kak(args):
     tmux new -- kak @(args)
+
+@aliases.register
+def _toCap(args, stdin=None):
+    text = stdin.read() if stdin else ' '.join(args)
+    print(text.title())
