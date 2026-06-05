@@ -1,9 +1,16 @@
 from prompt_toolkit.keys import Keys
 from prompt_toolkit.application import run_in_terminal
 
+import json
+import pathlib
+
+configPath = "/home/cward/.config/xonsh"
+
 
 $XONSH_SHOW_TRACEBACK = True
 $XONSH_TRACEBACK_LOGFILE = 'error.log'
+
+$PATH.append('~/.local/bin')
 
 #aliases['kak'] = lambda args: execx(f"tmux -c 'kak {args[0]}'")
 
@@ -55,3 +62,22 @@ def _kak(args):
 def _toCap(args, stdin=None):
     text = stdin.read() if stdin else ' '.join(args)
     print(text.title())
+
+with open(f"{configPath}/api_DeepSeek.txt") as f:
+    $API_DeepSeek = f.read()
+#    j = json.load(f)
+#    API_DeepSeek = j["DeepSeek"]
+#    #for key, value in j:
+#    #    @[f"API_{key}='{value}'"]
+
+@aliases.register
+def _claude(args):
+    $ANTHROPIC_AUTH_TOKEN=$API_DeepSeek
+    $ANTHROPIC_BASE_URL='https://api.deepseek.com/anthropic'
+    $ANTHROPIC_MODEL='deepseek-v4-pro[1m]'
+    $ANTHROPIC_DEFAULT_OPUS_MODEL='deepseek-v4-pro[1m]'
+    $ANTHROPIC_DEFAULT_SONNET_MODEL='deepseek-v4-pro[1m]'
+    $ANTHROPIC_DEFAULT_HAIKU_MODEL='deepseek-v4-flash'
+    $CLAUDE_CODE_SUBAGENT_MODEL='deepseek-v4-flash'
+    $CLAUDE_CODE_EFFORT_LEVEL='max'
+    claude --dangerously-skip-permissions
